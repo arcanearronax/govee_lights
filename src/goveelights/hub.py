@@ -1,8 +1,8 @@
 """
 
-govee_api.hub
+goveelights.hub
 
-This contains the engine for the govee_client itself.
+This contains the engine for the goveelights package.
 
 """
 import logging
@@ -405,80 +405,7 @@ class Color():
             GOVEE_KEY_COLOR_BLUE: self.blue
         }
 
-# class ColorTemperature():
-#     """
-#     This class defines how color temperatures are handled by the light. The values represent the color of light emitted by a source in degrees celcius.
-#     """
-#
-#     def __init__(self, current=None, min=None, max=None):
-#         self.min = min
-#         self.max = max
-#         self.current = current
-#
-#     @property
-#     def current(self):
-#         """
-#         This returns the current light temperature of a device.
-#         """
-#         return self._current_temp
-#
-#     @current.setter
-#     def current(self, temp):
-#         """
-#         This takes in some value that can be cast as an int and attempts to set the light temperature to the specified value.
-#         """
-#
-#         temp_int = ColorTemperature.validate_int(temp)
-#
-#         # Validate the temp is within acceptable limits.
-#         if temp_int < self.min or temp_int > self.max:
-#             raise ColorTemperatureException(f"Temp {temp_int} is not within range [{self.min}, {self.max}].")
-#
-#         # Now we actually set the temp
-#         self._current_temp = temp_int
-#
-#     @property
-#     def min(self):
-#         return self._min_temp
-#
-#     @min.setter
-#     def min(self, temp):
-#         temp_int = ColorTemperature.validate_int(temp)
-#         assert temp_int >= 0, "Temperature must be non-negative."
-#         self._min_temp = temp_int
-#
-#     @property
-#     def max(self):
-#         return self._max_temp
-#
-#     @max.setter
-#     def max(self, temp):
-#         temp_int = ColorTemperature.validate_int(temp)
-#         assert temp_int >= 0, "Temperature must be non-negative."
-#         self._max_temp = temp_int
-#
-#     #
-#     # Here is some helper stuff
-#     #
-#
-#     @staticmethod
-#     def validate_int(temp):
-#         # Verify we can interpret the temp as a number
-#         try:
-#             temp_int = int(temp)
-#         except TypeError:
-#             raise ColorTemperatureException("Must be able to convert value to int.")
-#
-#         return temp_int
-
-
-
 class ColorException(Exception):
     """
     This class is used to indicate some issue was encountered with a color.
-    """
-
-class ColorTemperatureException(Exception):
-    """
-    This class is used to indicate some issue was encountered with a color temp.
     """
