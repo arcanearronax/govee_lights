@@ -1,6 +1,6 @@
 """
 
-govee_api.govee
+goveelights.client
 
 This contains the base class for all Govee devices.
 

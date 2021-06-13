@@ -1,5 +1,5 @@
 """
-govee_api.device
+goveelights.device
 
 This is the base class for Govee devices that use the API.
 
