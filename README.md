@@ -1,14 +1,13 @@
-govee_client
-============
+# govee_lights
+
 
 This repository contains a set of objects which can be used to control a Govee API v1.2 compatible device. This requires a valid API key, which can be requested by contacting [Govee Support](https://us.govee.com/pages/contact-us).
 
-# Overview
----
+------------
 
-This package provides three (3) primary and two (2) supporting objects which the user will need to be concerned with.
+## Overview
 
-Primary:
+This package provides three (3) objects the user will need to be concerned withy:
 1. GoveeDevice
 2. GoveeClient
 3. GoveeHub
@@ -19,18 +18,11 @@ The GoveeClient class is used to submit HTTP requests to the Govee API. This con
 
 The GoveeHub class contains an instance of the GoveeClient and an indefinite number of GoveeDevice instances. The hub is used to facilitate submitting API requests and managing the devices registered to the user.
 
-Supporting:
-1. Color
-2. ColorTemperature
-
-The Color class represents a traditional 3-byte RGB value. This value is sent in an API request to set the color of light emitted by a color compatible light emitting Govee device. The class contains the logic necessary to ensure only appropriate colors can be created.
-
-The ColorTemperature class represents a color corresponding to a star in degrees kelvin. This value is sent in an API request to set the color of light emitted by a temperature compatible light emitting Govee device. This class contains the logic necessary to ensure only a permitted color temperature is set.
-
 This is a simple package to allow Govee API compatible devices to integrate with Home Assistant.
 
-## Dependencies
 ---
+
+## Dependencies
 
 * Python 3.8 (Minimum version required)
   * requests (2.0.0)
@@ -40,18 +32,34 @@ This is a simple package to allow Govee API compatible devices to integrate with
 * Govee API Key
 * Govee API compatible device(s)
 
+---
+
 ## Usage
+
+Below here you may find steps to complete a basic set of operations which a user will be able to complete with this package. This does not fully explain the capabilities of the package, but does provide a basic idea..
+
+---
+
+### Using as a standalone product
+
+In order to use this as a standalone product (not part of a service such as Home Assistant) you can refer to the **Usage** section above.
+
+---
+
+### Creating a GoveeClient Object
 
 The user will need to create an instance of the `GoveeClient` class, this will require an API key, provided by Govee Support.
 
 ```python
-from govee_api import GoveeClient, GoveeHub, GoveeDevice
+from goveelights import GoveeClient, GoveeHub, GoveeDevice
 
 api_key = #Whatever your API key is, as a string.
 client = GoveeClient(api_key)
 ```
 
 After this the user will need to instantiate a `GoveeHub` object, passing the `GoveeClient` object as a parameter.  Once the hub has been created, the user will need to call the `get_devices` method in order to automatically generate `GoveeDevice` objects.
+
+### Creating a GoveeHub Object
 
 ```python
 hub = GoveeHub(GoveeDevice, client)
@@ -72,6 +80,8 @@ This will print out something approximating the text below.
 59:e4:7c:a6:a1:09:42:9d - <__main__.GoveeDevice object at 0x7f7b87802fa0>
 11:a3:7c:a6:a1:39:a0:47 - <__main__.GoveeDevice object at 0x7f7b87bde490>
 ```
+
+### Using GoveeDevice Objects
 
 Once the user has their desired devices, they have access to up to four (4) different methods they may use to interact with the light.
 * `set_power_state`
@@ -128,7 +138,7 @@ hub.set_color(bedroom_light_id, r=GOVEE_COLOR_MAX, b=GOVEE_COLOR_MAX)
 hub.set_color(kitchen_light_id, r=GOVEE_COLOR_MAX / 2, g=GOVEE_COLOR_MAX / 2, b=GOVEE_COLOR_MAX / 2)
 ```
 
-The user is able to set the temperature of the color of the light by running the commands below.
+The user is able to set the temperature[^1] of the color of the light by running the commands below.
 
 ```python
 
@@ -150,7 +160,21 @@ These methods correspond to the device commands listed below. These are the comm
 * `color`
 * `colorTem`
 
-### GoveeDevice Information
+---
+
+### Using as a Home Assistant integration
+
+*This section will be filled in when I figure it out.*
+
+---
+
+## Package Classes
+
+Below here we have a breakdown of the different classes available within this package. This will contain more technical information.
+
+---
+
+### GoveeDevice
 
 A `GoveeDevice` object will identify a set of properties which identify the methods a given device supports.
 
@@ -158,15 +182,27 @@ A `GoveeDevice` object will identify a set of properties which identify the meth
 
 Static properties are the properties of `GoveeDevice` objects which may not be modified once the objects have been instantiated. These are used to indicate what the device is and is not capable of.
 
+* `device`
+* `model`
+* `device_name`
 * `controllable`
 * `retrievable`
 * `supported_commands`
+* `color_temp_range`
+
+The `device` property is the unique identifier which Govee provides in order to identify individual devices. These appear to be based on the MAC address of the devices themselves.
+
+The `model` property is the name of the model of the device.
+
+The `device_name` property is the name of the device as configured within Govee's service.
 
 The `controllable` property indicates whether the device is capable of receiving commands which result in some change of state to the device.
 
 The `retrievable` property indicates whether the user is able to poll the state of the device.
 
 The `supported_commands` property indicates which of the four (4) device commands the device supports.
+
+The `color_temp_range` property indicates the supported range of color temperatures which can be used to set the color of light.
 
 #### State Properties
 
@@ -190,9 +226,20 @@ The `brightness` property may assume the value of any `int` between the values `
 
 The `color` property is an instance of a `Color` object. This object represents the 3-byte RGB value of a color.
 
-The `color_temp` property is an instance of a `ColorTemp` object. This object is used to represent the color temperature light[^1] emitted by a `GoveeDevice` object. This also identifies the minimum and maximum temperatures which a device may
+The `color_temp` property is an integer within the (inclusive) range defined by the `color_temp_range` property.
 
-### GoveeClient Information
+#### Public Methods
+
+The methods here are available for use outside the class itself.
+
+* `__init__`
+* `update_status`
+
+The `__init__` method requires the user pass a `GoveeHub` object and a `dict` containing device information, as provided by the `GoveeHub`.
+
+---
+
+### GoveeClient
 
 A `GoveeClient`object is used to facilitate communication between a `GoveeHub` object and the Govee API itself. A user must provide a valid Govee API Key in order to instantiate and utilize the object.
 
@@ -202,7 +249,7 @@ The `GoveeClient` object offers the ability to submit `GET` and `PUT` requests t
 
 The only `GoveeClient` property that exists is `api_key`. This holds the API key the user includes in API requests and is used to validate the request itself.
 
-#### Communication with the Govee API
+#### Public Methods
 
 A user is able to submit requests to the Govee API by using either of the methods below.
 * `get_data`
@@ -216,16 +263,56 @@ The `get_data` method includes the parameters listed below.
 The `put_data` method includes the parameters listed above, as well as the one listed below.
 * `req_payload` - The JSON data to be included in the request.
 
-### GoveeHub Information
+---
 
-A `GoveeHub` object is used to facilitate communication between the user, `GoveeClient` objects, and `GoveeDevice` objects. Since 
+### GoveeHub
+
+A `GoveeHub` object is used to facilitate communication between the user, `GoveeClient` objects, and `GoveeDevice` objects. Since
 
 This will create the hub object the user will use to interact with the `GoveeDevice` objects which represent the physical Govee devices.
 
-### Using as a stand alone product
+#### GoveeHub Properties
 
-### Using as a Home Assistant integration
+The GoveeHub offers the properties listed below.
+
+* `devices`
+* `client`
+
+The `devices` property is a list of `GoveeDevice` objects which are associated with the user's account.
+
+The `client` property is a `GoveeClient` object. This serves as the client the hub will rely on for communication with the Govee API.
+
+#### Public Methods
+
+The GoveeHub offers the public methods listed below.
+
+* `get_devices`
+* `get_device_state`
+* `set_power_state`
+* `set_brightness`
+* `set_color`
+* `set_color_temp`
+
+The `get_devices` method is used to retrieve information for all Govee devices from the Govee API and creates a `GoveeDevice` object for each device. The devices are automatically added to the `devices` property.
+
+The `get_device_state` method is used to retrieve the current state of a specific `GoveeDevice` object.
+
+The `set_power_state` method is used to turn a `GoveeDevice` object on or off.
+
+The `set_brightness` method is used to control the brightness of a `GoveeDevice` object.
+
+The `set_color` method is used to set the color of light output by a `GoveeDevice` object.
+
+The `set_color_temp` method is used to set the color of light output by a `GoveeDevice` object
+
+---
+
+## Automated Testing
+
+The test cases are located in the `tests` directory and are sorted based on whether they're unit, functional, or integration based tests.
+
+---
 
 ## Additional Comments
 
-[^1] [Color Temperature](https://en.wikipedia.org/wiki/Color_temperature) is used to determine the color of light a `GoveeDevice` will will emit. Since an ideal source will emit a calculable color of light at a given temperature. Temperatures around 2800 K are a warmer yellow while temperatures closer to 8000 K are a cooler bluish.
+[^1]: [Color Temperature](https://en.wikipedia.org/wiki/Color_temperature) is used to determine the color of light a `GoveeDevice` will will emit. Since an ideal source will emit a calculable color of light at a given temperature. Temperatures around 2800 K are a warmer yellow while temperatures closer to 8000 K are a cooler bluish.
