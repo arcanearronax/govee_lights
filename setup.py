@@ -10,7 +10,7 @@ setuptools.setup(
     description="A small package to interact with the Govee API.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/arcanearronax/govee-lights",
+    url="https://github.com/arcanearronax/govee_lights",
     project_urls={
         "Bug Tracker": "https://github.com/arcanearronax/govee_lights/issues",
     },
