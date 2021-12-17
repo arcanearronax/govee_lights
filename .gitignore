@@ -1,3 +1,10 @@
+# Don't update the account file unless certain
+tests/account.py
+
+#
+# Defaults below here
+#
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

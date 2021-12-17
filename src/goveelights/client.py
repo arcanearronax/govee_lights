@@ -5,27 +5,7 @@ goveelights.client
 This contains the base class for all Govee devices.
 
 """
-<<<<<<< HEAD
-from uuid import UUID
-import requests
-import json
 
-import logging
-
-GOVEE_HEADER_CONT_TYPE = "application/json"
-GOVEE_HEADER_API_KEY = "Govee-API-Key"
-
-GOVEE_QUERY_DEVICE = "device"
-GOVEE_QUERY_MODEL = "model"
-
-GOVEE_DATA_DICT_KEY = "data"
-GOVEE_UUID_VERSION = 4
-
-SUCCESS_CODES = [200, 201, 202]
-
-logger = logging.getLogger(__name__)
-#logging.basicConfig(filename='testing.log', level=logging.INFO)
-=======
 import json
 import logging
 import logging.config
@@ -124,7 +104,6 @@ def get_response_headers(response):
         attr: value for attr, value in response.headers.items() if attr in GOVEE_HEADERS
     }
 
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
 
 class GoveeClient():
     """
@@ -132,22 +111,6 @@ class GoveeClient():
     """
 
     def __init__(self, api_key):
-<<<<<<< HEAD
-        self.api_key = api_key
-
-    #
-    # Stuff the user would need to call
-    #
-
-    @property
-    def api_key(self):
-        return self._api_key
-
-    # May not actually need this...
-    @api_key.setter
-    def api_key(self, api_key):
-        self._api_key = GoveeClient._validate_uuid(api_key)
-=======
         logger.info("Creating client")
         self.api_key = api_key
 
@@ -170,19 +133,11 @@ class GoveeClient():
         """
         logger.debug(f"setting API Key: {api_key}")
         self._api_key = validate_api_key(api_key)
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
 
     #
     # Here contains methods sending data TO the API
     #
 
-<<<<<<< HEAD
-    def get_data(self, req_uri, device_id=None, model=None):
-        """
-        This is used to by the hub to submit data requests to the Govee API. It returns a dict with information from the API.
-        """
-        # Need to validate the parameters
-=======
     def validate_response(self, response):
         """
         This method is used to validate the response headers are within
@@ -210,26 +165,12 @@ class GoveeClient():
         logger.info(f"get_data: {device_id} - {model}")
         logger.debug(f"Request Target: {req_uri}")
 
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
         try:
             req = requests.get(
                 req_uri,
                 headers=self._generate_headers(),
                 params=GoveeClient._generate_params(device_id, model)
             )
-<<<<<<< HEAD
-        except Exception as e:
-            logger.error(f"GET error: {e}")
-            return None
-
-        else:
-            logger.info(f"Got status code: {req.status_code}")
-            if req.status_code not in SUCCESS_CODES:
-                raise InvalidResponse(f"Received a {req.status_code} response.")
-
-            ret_dict = json.loads(req.text)[GOVEE_DATA_DICT_KEY]
-            logger.info(f"get_data - {ret_dict}")
-=======
 
         except Exception as e:
             logger.error(f"GET Exception: {e}")
@@ -240,19 +181,10 @@ class GoveeClient():
             logger.debug(f"Headers: {req.headers}")
 
             ret_dict = self.validate_response(req)[KEY_DATA]
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
             return ret_dict
 
     def put_data(self, req_uri, device_id, model, req_body):
         """
-<<<<<<< HEAD
-        This is responsible for sending commands intended to control a specific light.
-        """
-
-        # This will require additional logic to handle valid and invalid commands
-
-        try:
-=======
         This is responsible for sending commands intended to control a specific
         light.
         """
@@ -261,18 +193,12 @@ class GoveeClient():
 
         try:
             logger.debug(f"Request Body: {req_body} - {type(req_body)}")
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
             req = requests.put(
                 req_uri,
                 headers=self._generate_headers(),
                 params=GoveeClient._generate_params(device_id, model),
                 json=req_body
             )
-<<<<<<< HEAD
-        except Exception as e:
-            logger.error(f"put_data error - {e}")
-            return None
-=======
             logger.debug(f"Got response: {req.status_code} - {req.text}")
         except Exception as e:
             logger.error(f"PUT Exception: {e}")
@@ -285,70 +211,12 @@ class GoveeClient():
 
             ret_dict = self.validate_response(req)[KEY_DATA]
             return ret_dict
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
 
     #
     # This is just the helper stuff
     #
 
     def _generate_headers(self):
-<<<<<<< HEAD
-        # Just throwing this here for now
-        return {
-            GOVEE_HEADER_API_KEY: self.api_key,
-            "Content-Type": GOVEE_HEADER_CONT_TYPE,
-        }
-
-    def _generate_params(device_id=None, model=None):
-        """
-        This is used to generate the parameters used in some API requests.
-        """
-        logger.info(f"Generating params for {device_id} - {model}")
-        if device_id and model:
-            return {
-                GOVEE_QUERY_DEVICE: device_id,
-                GOVEE_QUERY_MODEL: model,
-            }
-        # In case we don't have parameters to generate
-        return None
-
-    def _validate_uuid(uuid_key):
-        """
-        This method receives a string and validates it's a UUIDv4 key. It returns the key as a string if it's valid, throws an error otherwise.
-        """
-        try:
-            key_version = UUID(uuid_key).version
-            logger.info(f"Got valid key version: {key_version}")
-        except (ValueError, TypeError):
-            logger.info(f"Invalid UUID key provided")
-            raise InvalidAPIKey("Not a valid UUID.")
-        else:
-            if key_version != GOVEE_UUID_VERSION:
-                raise InvalidAPIKey(f"UUID is not version {GOVEE_UUID_VERSION}")
-
-        logger.info("Returning valid UUID key")
-        return uuid_key
-
-class GoveeException(Exception):
-    """
-    A Govee error occurred.
-    """
-
-class InvalidDevice(GoveeException):
-    """
-    An invalid device was present in the registry.
-    """
-
-class InvalidAPIKey(GoveeException):
-    """
-    An invalid Govee API key was provided.
-    """
-
-class InvalidResponse(GoveeException):
-    """
-    A non-200 code was received when submitting an API request.
-    """
-=======
         """
         This is for internal use.
         This generates the headers for the request to the Govee API.
@@ -474,4 +342,3 @@ class InvalidResponse(GoveeException):
             return True
 
         return False
->>>>>>> 95206d1969f7285686979b827c82104c492977d7
